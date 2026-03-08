@@ -1,62 +1,108 @@
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-import { setupPrimary } from 'cluster';
+// import multer from 'multer';
+// import path from 'path';
+// import fs from 'fs';
+// import { setupPrimary } from 'cluster';
 
-const uploadDir ="uploads";
- if(!fs.existsSync(uploadDir)){
-    fs.mkdirSync(uploadDir);
- }
+// const uploadDir ="uploads";
+//  if(!fs.existsSync(uploadDir)){
+//     fs.mkdirSync(uploadDir);
+//  }
 
 
- ///ensure uploader folder exists
+//  ///ensure uploader folder exists
  
 
- //multer setup
+//  //multer setup
 
 
- const  storage =multer.diskStorage({
-    destination: function(req,file,cb){
-        cb(null,uploadDir);
-    },
+//  const  storage =multer.diskStorage({
+//     destination: function(req,file,cb){
+//         cb(null,uploadDir);
+//     },
 
-    filename:function(req,file,cb){
-         const uniqueName = Date.now() + "-" + Math.round(Math.random()* 1e9);
-         cb(
-            null,uniqueName + path.extname(file.originalname)
-         )
-    },
- });
-
-
-
- //file filter
- const fileFilter =(req,file,cb)=>{
-    if(
-        file.mimetype === "image/png" ||
-        file.mimetype === "image/jpg" ||
-        file.mimetype === "image/jpeg" ||
-        file.mimetype === "image/webp" 
-    )
-    {
-        cb(null,true);
-
-    } else{
-        cb(new Error ("only image filters are allowed"),false);
-
-    }
- };
-
- //multer config
-  const upload = multer({
-     storage,
-     fileFilter,
-     limits:{
-        fileSize: 5* 1024  *1024, //5mb
-
-     }
-  });
+//     filename:function(req,file,cb){
+//          const uniqueName = Date.now() + "-" + Math.round(Math.random()* 1e9);
+//          cb(
+//             null,uniqueName + path.extname(file.originalname)
+//          )
+//     },
+//  });
 
 
 
-  export default upload;
+//  //file filter
+//  const fileFilter =(req,file,cb)=>{
+//     if(
+//         file.mimetype === "image/png" ||
+//         file.mimetype === "image/jpg" ||
+//         file.mimetype === "image/jpeg" ||
+//         file.mimetype === "image/webp" 
+//     )
+//     {
+//         cb(null,true);
+
+//     } else{
+//         cb(new Error ("only image filters are allowed"),false);
+
+//     }
+//  };
+
+//  //multer config
+//   const upload = multer({
+//      storage,
+//      fileFilter,
+//      limits:{
+//         fileSize: 5* 1024  *1024, //5mb
+
+//      }
+//   });
+
+
+
+//   export default upload;
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+const uploadDir = path.join(process.cwd(), "uploads");
+
+// create uploads folder if not exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+// storage config
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueName = Date.now() + "-" + Math.round(Math.random() * 1e9);
+    cb(null, uniqueName + path.extname(file.originalname));
+  },
+});
+
+// file filter
+const fileFilter = (req, file, cb) => {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpg" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/webp"
+  ) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files are allowed"), false);
+  }
+};
+
+// multer config
+const upload = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 5 * 1024 * 1024, // 5MB
+  },
+});
+
+export default upload;
