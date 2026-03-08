@@ -7,7 +7,9 @@ import doctorRouter from './routes/doctorRouter.js';
 import serviceRouter from './routes/ServiceRouter.js';
 import appointmentRouter from './routes/appointmentRouter.js';
 import serviceAppointmentRouter from './routes/serviceAppointmentRouter.js';
-
+import compression from "compression";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 
 
 
@@ -15,6 +17,21 @@ import serviceAppointmentRouter from './routes/serviceAppointmentRouter.js';
 
 const app =express();
 const port =4000;
+
+
+/* security headers */
+app.use(helmet());
+
+/* compress API responses */
+app.use(compression());
+
+/* rate limit protection */
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200
+});
+
+app.use(limiter);
 
 const allowedOrigins =[
     "http://localhost:5173",
@@ -32,19 +49,21 @@ const allowedOrigins =[
 app.use(
   cors({
     origin: function (origin, callback) {
+
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes(origin)) {
+      if (
+        allowedOrigins.includes(origin) ||
+        origin.includes("vercel.app")
+      ) {
         return callback(null, true);
       }
 
-      return callback(new Error("Not allowed by CORS"));
-
+      return callback(null, true);
     },
     credentials: true,
-    methods:["GET","POST","PUT","DELETE","OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-
+    methods: ["GET","POST","PUT","DELETE","OPTIONS"],
+    allowedHeaders: ["Content-Type","Authorization"]
   })
 );
 app.use(clerkMiddleware());
