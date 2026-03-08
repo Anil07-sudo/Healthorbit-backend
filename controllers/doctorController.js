@@ -409,60 +409,71 @@ export async function toggleAvailability(req,res) {
 }
 
 // to login the doctor
+export async function doctorLogin(req, res) {
+  try {
+    const { email, password } = req.body || {};
 
-export async function doctorLogin(req,res){
-    try{
-      const{email,password} =req.body || {};
-      if(!email || !password) return res.status(400).json({
-        success:false,
-        message: "EMail and apssword are req"
-
-      });
-      const doc = await Doctor.findOne({email:email.toLowerCase()}).select("+password");
-      if(!doc) return res.status(401).json({
-        suceess:false,
-        message:"Invalid creds"
-      });
-
-
-      if(doc.password !== password) return res.status(401).json({
+    if (!email || !password) {
+      return res.status(400).json({
         success: false,
-        message:"Inavlid Credentials"
+        message: "Email and password are required",
       });
-
-      const secret = process.env.JWT_SECRET;
-      if(!secret) return res.status(500).json({
-        success: false,
-        message:"server Misconfigured"
-
-      });
-      
-    const token =jwt.sign({
-      id:doc._id.toString(), email: doc.email,
-      role :"doctor"
-    },secret,{ expiresIn: "7d"});
-    
-
-    const out =doc.toObject();
-    delete out.password;
-    return res.json({suceess: true, token, data : out});
-
-
-
     }
 
+    const doc = await Doctor.findOne({
+      email: email.toLowerCase(),
+    }).select("+password");
 
-    catch (err){
-      
-    console.error("login error :",err);
+    if (!doc) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    // password check
+    if (doc.password !== password) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const secret = process.env.JWT_SECRET;
+
+    if (!secret) {
+      return res.status(500).json({
+        success: false,
+        message: "Server misconfigured",
+      });
+    }
+
+    const token = jwt.sign(
+      {
+        id: doc._id.toString(),
+        email: doc.email,
+        role: "doctor",
+      },
+      secret,
+      { expiresIn: "7d" }
+    );
+
+    const out = doc.toObject();
+    delete out.password;
+
+    return res.json({
+      success: true,
+      token,
+      data: out,
+    });
+
+  } catch (err) {
+    console.error("login error:", err);
     return res.status(500).json({
       success: false,
-      message:"Server Error"
+      message: "Server Error",
     });
-      
-
-   }
+  }
 }
-  
 
   
