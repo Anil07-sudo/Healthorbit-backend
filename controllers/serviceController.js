@@ -123,7 +123,8 @@ export async  function createService(req,res){
 
 const formatted = list.map((s) => ({
   ...s,
-  image: s.imageUrl || s.image || null
+  image: s.imageUrl || s.image || "",
+  imageUrl: s.imageUrl || s.image || ""
 }));
 
 return res.status(200).json({
@@ -234,18 +235,15 @@ return res.status(200).json({
         console.error("Cloudinary upload error:", err);
       }
     }
-
-    const upadted = await Service.findByIdAndUpdate(id,updateData,{
-
-      new: true,
-      runValidators: true
-
-    });
+const updated = await Service.findByIdAndUpdate(id, updateData, {
+  returnDocument: "after",
+  runValidators: true
+});
 
 
     return res.status(200).json({
       success: true,
-      data: upadted,
+      data: updated,
       message :" Service Updated"
     })
 
