@@ -7,7 +7,7 @@ import { createDoctor, deleteDoctor, doctorLogin, getDoctors, getDoctorsById, to
 
 import doctorAuth from '../middleware/doctorAuth.js';
 import upload from '../middleware/multer.js';
- const uplaod =multer({dest :"/temp"});
+//  const uplaod =multer({dest :"/temp"});
 
  const doctorRouter = express.Router();
 
