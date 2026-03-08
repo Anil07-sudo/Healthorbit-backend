@@ -119,11 +119,17 @@ export async  function createService(req,res){
 }
 
    export async  function getServices(req,res){
-    try{ const list =await Service.find().sort({createdAt: -1}).lean();
-    return res.status(200).json({
-      success:true,
-      data: list
-    });
+    try{ const list = await Service.find().sort({ createdAt: -1 }).lean();
+
+const formatted = list.map((s) => ({
+  ...s,
+  image: s.imageUrl || s.image || null
+}));
+
+return res.status(200).json({
+  success: true,
+  data: formatted
+});
 
     }
     catch(err){
@@ -154,10 +160,13 @@ export async  function createService(req,res){
         message:"Service not found"
        });
 
-       return res.status(200).json({
-        success: true,
-        data: foundService
-       });
+      return res.status(200).json({
+  success: true,
+  data: {
+    ...foundService,
+    image: foundService.imageUrl || foundService.image || null
+  }
+});
     }
 
     catch(err){
