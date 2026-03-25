@@ -410,7 +410,7 @@ try{
         status: "Confirmed",
         paidAt: new Date(),
       },
-      { new: true }
+   { returnDocument: 'after' }
     );
 
     // fallback: try match via metadata (doctorId + mobile + patientName)
