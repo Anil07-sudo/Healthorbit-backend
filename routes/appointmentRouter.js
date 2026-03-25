@@ -20,7 +20,7 @@ appointmentRouter.get("/stats/summary", getStats);
 
  appointmentRouter.get("/doctor/:doctorId",getAppointmentsByDoctor);
  appointmentRouter.post("/:id/cancel", cancelAppointment);
- appointmentRouter.get('/paitents/count', getRegisteredUserCount);
+ appointmentRouter.get('/patients/count', getRegisteredUserCount);
  appointmentRouter.put("/:id",updateAppointment);
 
 
